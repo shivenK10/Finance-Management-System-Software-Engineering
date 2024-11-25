@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Management System - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-image">
+    <!-- Navigation Bar with Conditional Links -->
+    <nav class="navbar">
+        <a href="/">Home</a>
+        {% if logged_in %}
+            <a href="/expenditure">Expenditure</a>
+            <a href="/stock">Stock</a>
+            <a href="/educational">Educational</a>
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/login">Login</a>
+            <a href="/signup">Sign Up</a>
+            <a href="/educational">Educational</a>
+        {% endif %}
+    </nav>
+
+    <!-- Centered Container with Overlay Box for Text -->
+    <div class="centered-container">
+        <div class="container overlay-box">
+            <h1>Welcome to the Finance Management System</h1>
+            <p>Your one-stop solution for managing expenses, tracking investments, and learning about financial growth strategies.</p>
+        </div>
+    </div>
+</body>
+</html>

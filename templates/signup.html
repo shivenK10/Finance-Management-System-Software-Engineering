@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-image">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="/">Home</a>
+        {% if logged_in %}
+            <a href="/expenditure">Expenditure</a>
+            <a href="/stock">Stock</a>
+            <a href="/educational">Educational</a>
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/login">Login</a>
+            <a href="/signup">Sign Up</a>
+            <a href="/educational">Educational</a>
+        {% endif %}
+    </nav>
+
+    <!-- Signup Form -->
+    <div class="centered-container">
+        <div class="container overlay-box">
+            <h2>Create an Account</h2>
+            <form method="POST" action="/signup">
+                <input type="text" name="name" placeholder="Full Name" value="{{ name or '' }}" required>
+                <input type="text" name="username" placeholder="Username" value="{{ username or '' }}" required>
+                <input type="tel" name="phone" placeholder="Phone Number" value="{{ phone or '' }}" required>
+                <input type="password" name="password" placeholder="Password" required>
+                {% if error_message %}
+                    <p class="error-message">{{ error_message }}</p>
+                {% endif %}
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

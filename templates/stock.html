@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Stock Data</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="/">Home</a>
+        {% if logged_in %}
+            <a href="/expenditure">Expenditure</a>
+            <a href="/stock">Stock</a>
+            <a href="/educational">Educational</a>
+            <a href="/logout" style="margin-left: auto;">Logout</a>
+        {% else %}
+            <a href="/login">Login</a>
+            <a href="/signup">Sign Up</a>
+            <a href="/educational">Educational</a>
+        {% endif %}
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container internal-page">
+        <h2>Live Stock Data</h2>
+
+        <!-- Live Stock Prices -->
+        <div class="stock-container">
+            <div>
+                <h3>NIFTY</h3>
+                <p id="niftyPrice">Price: ₹{{ nifty[-1] }}</p>
+                <canvas id="niftyChart"></canvas>
+            </div>
+            <div>
+                <h3>SENSEX</h3>
+                <p id="sensexPrice">Price: ₹{{ sensex[-1] }}</p>
+                <canvas id="sensexChart"></canvas>
+            </div>
+            <div>
+                <h3>USD/INR</h3>
+                <p id="usdInrPrice">Price: ₹{{ usd_inr[-1] }}</p>
+                <canvas id="usdInrChart"></canvas>
+            </div>
+            <div>
+                <h3>NIFTY BANK</h3>
+                <p id="bankNiftyPrice">Price: ₹{{ banknifty[-1] }}</p>
+                <canvas id="bankNiftyChart"></canvas>
+            </div>
+        </div>
+        <div class="stock-container second-row">
+            <div>
+                <h3>NIFTY MIDCAP 50</h3>
+                <p id="midcpNiftyPrice">Price: ₹{{ midcpnifty[-1] }}</p>
+                <canvas id="midcpNiftyChart"></canvas>
+            </div>
+            <div>
+                <h3>NIFTY IT</h3>
+                <p id="niftyITPrice">Price: ₹{{ niftyit[-1] }}</p>
+                <canvas id="niftyITChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Stock Search Form -->
+        <h2>Search Stock</h2>
+        <form id="stockSearchForm">
+            <input type="text" id="symbol" name="symbol" placeholder="Enter Stock Symbol/Company Name" required>
+            <select id="duration" name="duration">
+                <option value="6mo">6 Months</option>
+                <option value="1y">1 Year</option>
+                <option value="2y">2 Years</option>
+                <option value="5y">5 Years</option>
+            </select>
+            <button type="submit">Search</button>
+        </form>
+
+        <!-- Search Result Section -->
+        <div id="searchResult" style="display:none;">
+            <h3 id="searchStockName"></h3>
+            <p id="currentPrice"></p>
+            <p id="originalPrice"></p>
+            <canvas id="searchChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Store last prices to detect changes
+        let lastPrices = {
+            nifty: null,
+            sensex: null,
+            usd_inr: null,
+            banknifty: null,
+            midcpnifty: null,
+            niftyit: null
+        };
+
+        // Function to create a chart
+        function createChart(ctx, labels, data, title, xLabel, yLabel) {
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: title,
+                        data: data,
+                        borderColor: '#5DADE2',
+                        backgroundColor: 'rgba(93, 173, 226, 0.2)',
+                        pointBackgroundColor: '#5DADE2',
+                        pointBorderColor: '#5DADE2',
+                        pointRadius: 3,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: xLabel,
+                                color: '#AED6F1',
+                                font: {
+                                    size: 14
+                                }
+                            },
+                            ticks: { color: '#AED6F1' },
+                            grid: { color: '#34495E' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: yLabel,
+                                color: '#AED6F1',
+                                font: {
+                                    size: 14
+                                }
+                            },
+                            ticks: { color: '#AED6F1' },
+                            grid: { color: '#34495E' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#AED6F1' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize charts for all stock data
+        const niftyChart = createChart(
+            document.getElementById('niftyChart').getContext('2d'),
+            Array.from({ length: 5 }, (_, i) => i + 1),
+            {{ nifty|tojson }},
+            'NIFTY',
+            'Time',
+            'Price (₹)'
+        );
+
+        const sensexChart = createChart(
+            document.getElementById('sensexChart').getContext('2d'),
+            Array.from({ length: 5 }, (_, i) => i + 1),
+            {{ sensex|tojson }},
+            'SENSEX',
+            'Time',
+            'Price (₹)'
+        );
+
+        const usdInrChart = createChart(
+            document.getElementById('usdInrChart').getContext('2d'),
+            Array.from({ length: 5 }, (_, i) => i + 1),
+            {{ usd_inr|tojson }},
+            'USD/INR',
+            'Time',
+            'Price (₹)'
+        );
+
+        const bankNiftyChart = createChart(
+            document.getElementById('bankNiftyChart').getContext('2d'),
+            Array.from({ length: 5 }, (_, i) => i + 1),
+            {{ banknifty|tojson }},
+            'BANKNIFTY',
+            'Time',
+            'Price (₹)'
+        );
+
+        const midcpNiftyChart = createChart(
+            document.getElementById('midcpNiftyChart').getContext('2d'),
+            Array.from({ length: 5 }, (_, i) => i + 1),
+            {{ midcpnifty|tojson }},
+            'MIDCPNIFTY',
+            'Time',
+            'Price (₹)'
+        );
+
+        const niftyITChart = createChart(
+            document.getElementById('niftyITChart').getContext('2d'),
+            Array.from({ length: 5 }, (_, i) => i + 1),
+            {{ niftyit|tojson }},
+            'NIFTYIT',
+            'Time',
+            'Price (₹)'
+        );
+
+        // Fetch live data every 5 seconds
+        setInterval(fetchLiveData, 5000);
+
+        async function fetchLiveData() {
+            try {
+                const response = await fetch('/live_stock_data');
+                const data = await response.json();
+
+                if (data.error) {
+                    console.error("Error fetching live data:", data.error);
+                    return;
+                }
+
+                // Update each stock chart only if prices have changed
+                updateStockChart(niftyChart, data.nifty, "niftyPrice", lastPrices, "nifty");
+                updateStockChart(sensexChart, data.sensex, "sensexPrice", lastPrices, "sensex");
+                updateStockChart(usdInrChart, data.usd_inr, "usdInrPrice", lastPrices, "usd_inr");
+                updateStockChart(bankNiftyChart, data.banknifty, "bankNiftyPrice", lastPrices, "banknifty");
+                updateStockChart(midcpNiftyChart, data.midcpnifty, "midcpNiftyPrice", lastPrices, "midcpnifty");
+                updateStockChart(niftyITChart, data.niftyit, "niftyITPrice", lastPrices, "niftyit");
+            } catch (error) {
+                console.error("Error fetching live data:", error);
+            }
+        }
+
+        function updateStockChart(chart, newData, priceElementId, lastPrices, key) {
+            const latestPrice = newData[newData.length - 1];
+            if (lastPrices[key] !== latestPrice) {
+                lastPrices[key] = latestPrice;
+                document.getElementById(priceElementId).textContent = `Price: ₹${latestPrice}`;
+
+                chart.data.labels.push(chart.data.labels.length + 1);
+                chart.data.datasets[0].data.push(latestPrice);
+
+                if (chart.data.labels.length > 20) {
+                    chart.data.labels.shift();
+                    chart.data.datasets[0].data.shift();
+                }
+
+                chart.update();
+            }
+        }
+
+        // Persistent chart instance for search results
+        let searchChartInstance = null;
+
+        // Handle Stock Search Form Submission
+        document.getElementById('stockSearchForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const symbol = document.getElementById('symbol').value;
+            const duration = document.getElementById('duration').value;
+
+            try {
+                const response = await fetch('/search_stock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ symbol, duration })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById('searchResult').style.display = 'block';
+                    document.getElementById('searchStockName').textContent = `${data.stock_name} (${data.symbol})`;
+                    document.getElementById('currentPrice').textContent = `Converted Price: ₹${data.current_price}`;
+                    document.getElementById('originalPrice').textContent = `Original: ${data.original_currency} ${data.original_price}`;
+
+                    const ctx = document.getElementById('searchChart').getContext('2d');
+                    createOrUpdateSearchChart(ctx, data.dates, data.prices, data.stock_name, 'Date', `Price (${data.original_currency})`);
+                }
+            } catch (error) {
+                console.error("Error fetching stock data:", error);
+            }
+        });
+
+        function createOrUpdateSearchChart(ctx, labels, data, title, xLabel, yLabel) {
+            if (searchChartInstance) {
+                searchChartInstance.destroy();
+            }
+
+            searchChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: title,
+                        data: data,
+                        borderColor: '#5DADE2',
+                        backgroundColor: 'rgba(93, 173, 226, 0.2)',
+                        pointBackgroundColor: '#5DADE2',
+                        pointBorderColor: '#5DADE2',
+                        pointRadius: 3,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: xLabel,
+                                color: '#AED6F1',
+                                font: {
+                                    size: 14
+                                }
+                            },
+                            ticks: { color: '#AED6F1' },
+                            grid: { color: '#34495E' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: yLabel,
+                                color: '#AED6F1',
+                                font: {
+                                    size: 14
+                                }
+                            },
+                            ticks: { color: '#AED6F1' },
+                            grid: { color: '#34495E' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#AED6F1' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

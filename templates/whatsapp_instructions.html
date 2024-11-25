@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Instructions</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #E0E0E0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #1E1E1E;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            width: 100%;
+        }
+        h2 {
+            color: #5DADE2;
+        }
+        p, .number {
+            font-size: 1.1em;
+            margin: 15px 0;
+        }
+        .number {
+            color: #82CAFA;
+            font-weight: bold;
+        }
+        /* Button Styling */
+        .yes-btn {
+            background-color: #5DADE2;
+            color: #121212;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            width: 100%; /* Full width */
+            margin-top: 15px;
+        }
+        .yes-btn:hover {
+            background-color: #82CAFA;
+            transform: translateY(-2px); /* Lift button on hover */
+        }
+        .yes-btn:active {
+            background-color: #3498DB;
+            transform: translateY(1px); /* Slightly press down on click */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>WhatsApp Registration</h2>
+        <p>To activate the WhatsApp feature, send the code <strong>"join copper-stage"</strong> to the Twilio number below:</p>
+        <p class="number">{{ twilio_number }}</p>
+        <p>Once sent, you’ll start receiving reminders and can log expenses via WhatsApp.</p>
+        <form action="{{ url_for('verify_whatsapp') }}" method="POST">
+            <button type="submit" class="yes-btn">Verify and Continue</button>
+        </form>
+    </div>
+</body>
+</html>
